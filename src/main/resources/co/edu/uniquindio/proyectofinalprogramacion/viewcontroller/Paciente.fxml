@@ -11,6 +11,8 @@
         <Button text="Cancelar Cita" layoutX="150" layoutY="170" prefWidth="200" onAction="#handleCancelarCita"/>
         <Button text="Consultar Historial Médico" layoutX="150" layoutY="220" prefWidth="200" onAction="#handleConsultarHistorial"/>
         <Button text="Ver Notificaciones" layoutX="150" layoutY="270" prefWidth="200" onAction="#handleVerNotificaciones"/>
+        <Label text="Disponibilidades del Médico:" layoutX="150" layoutY="320"/>
+        <ComboBox fx:id="comboDisponibilidades" layoutX="150" layoutY="340" prefWidth="200"/>
         <Button text="Cerrar sesión" onAction="#handleCerrarSesion"/>
     </children>
 </AnchorPane>

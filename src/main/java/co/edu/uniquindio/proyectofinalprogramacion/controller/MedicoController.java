@@ -4,11 +4,69 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextInputDialog;
-
 import java.io.*;
+import java.util.Optional;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TextInputDialog;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Optional;
 
 public class MedicoController {
+
+    @FXML
+    private DatePicker datePickerDisponibilidad;
+    @FXML
+    private Spinner<Integer> spinnerHoraInicio;
+    @FXML
+    private Spinner<Integer> spinnerMinutoInicio;
+    @FXML
+    private Spinner<Integer> spinnerHoraFin;
+    @FXML
+    private Spinner<Integer> spinnerMinutoFin;
+
+    @FXML
+    public void initialize() {
+        spinnerHoraInicio.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(6, 22, 8));
+        spinnerMinutoInicio.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0, 15));
+        spinnerHoraFin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(6, 22, 9));
+        spinnerMinutoFin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0, 15));
+    }
+
+    @FXML
+    private void handleAdministrarHorarios(ActionEvent event) {
+        String medicoId = pedirDato("Disponibilidad", "Ingrese su ID de médico:");
+        if (medicoId == null) return;
+        LocalDate fecha = datePickerDisponibilidad.getValue();
+        int horaInicio = spinnerHoraInicio.getValue();
+        int minutoInicio = spinnerMinutoInicio.getValue();
+        int horaFin = spinnerHoraFin.getValue();
+        int minutoFin = spinnerMinutoFin.getValue();
+        if (fecha == null) {
+            mostrarAlerta("Error", "Complete todos los campos.");
+            return;
+        }
+        LocalTime inicio = LocalTime.of(horaInicio, minutoInicio);
+        LocalTime fin = LocalTime.of(horaFin, minutoFin);
+        try (FileWriter writer = new FileWriter("disponibilidades.csv", true)) {
+            writer.append(medicoId).append(",")
+                    .append(fecha.toString()).append(",")
+                    .append(inicio.toString()).append(",")
+                    .append(fin.toString()).append("\n");
+            mostrarAlerta("Éxito", "Disponibilidad registrada.");
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo registrar la disponibilidad.");
+        }
+    }
 
     // Acceso a los historiales médicos de sus pacientes
     @FXML
@@ -47,43 +105,6 @@ public class MedicoController {
             return;
         }
         mostrarAlerta("Éxito", "Diagnóstico registrado.");
-    }
-
-    // Administración de horarios de consulta
-    @FXML
-    private void handleAdministrarHorarios(ActionEvent event) {
-        String medicoId = pedirDato("Horarios", "Ingrese su ID de médico:");
-        if (medicoId == null) return;
-        String horarios = pedirDato("Horarios", "Ingrese los horarios disponibles separados por punto y coma (ej: Lunes 8-12;Martes 14-18):");
-        if (horarios == null) return;
-
-        File archivo = new File("horarios.csv");
-        boolean actualizado = false;
-        StringBuilder nuevosHorarios = new StringBuilder();
-        try (BufferedReader reader = archivo.exists() ? new BufferedReader(new FileReader(archivo)) : null) {
-            if (reader != null) {
-                String linea;
-                while ((linea = reader.readLine()) != null) {
-                    String[] datos = linea.split(",", 2);
-                    if (datos.length >= 2 && datos[0].equals(medicoId)) {
-                        nuevosHorarios.append(medicoId).append(",").append(horarios).append("\n");
-                        actualizado = true;
-                    } else {
-                        nuevosHorarios.append(linea).append("\n");
-                    }
-                }
-            }
-        } catch (IOException ignored) {}
-        if (!actualizado) {
-            nuevosHorarios.append(medicoId).append(",").append(horarios).append("\n");
-        }
-        try (FileWriter writer = new FileWriter(archivo, false)) {
-            writer.write(nuevosHorarios.toString());
-        } catch (IOException e) {
-            mostrarAlerta("Error", "No se pudo guardar el horario.");
-            return;
-        }
-        mostrarAlerta("Éxito", "Horario actualizado.");
     }
 
 

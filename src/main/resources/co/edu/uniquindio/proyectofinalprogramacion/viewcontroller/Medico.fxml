@@ -8,8 +8,18 @@
         <Label text="Panel de Médico" layoutX="180" layoutY="20" style="-fx-font-size: 20px;"/>
         <Button text="Ver Historiales de Pacientes" layoutX="150" layoutY="70" prefWidth="200" onAction="#handleVerHistoriales"/>
         <Button text="Registrar Diagnóstico/Tratamiento" layoutX="150" layoutY="120" prefWidth="200" onAction="#handleRegistrarDiagnostico"/>
-        <Button text="Administrar Horarios" layoutX="150" layoutY="170" prefWidth="200" onAction="#handleAdministrarHorarios"/>
         <Button text="Ver Notificaciones de Citas" layoutX="150" layoutY="220" prefWidth="200" onAction="#handleVerNotificaciones"/>
         <Button text="Cerrar sesión" onAction="#handleCerrarSesion"/>
+        <Label text="Registrar Disponibilidad" layoutX="170" layoutY="270" style="-fx-font-size: 16px;"/>
+        <Label text="Fecha:" layoutX="100" layoutY="310"/>
+        <DatePicker fx:id="datePickerDisponibilidad" layoutX="150" layoutY="305"/>
+        <Label text="Hora inicio:" layoutX="100" layoutY="350"/>
+        <Spinner fx:id="spinnerHoraInicio" layoutX="170" layoutY="345" prefWidth="80"/>
+        <Spinner fx:id="spinnerMinutoInicio" layoutX="240" layoutY="345" prefWidth="60"/>
+        <Label text="Hora fin:" layoutX="100" layoutY="390"/>
+        <Spinner fx:id="spinnerHoraFin" layoutX="170" layoutY="385" prefWidth="80"/>
+        <Spinner fx:id="spinnerMinutoFin" layoutX="240" layoutY="385" prefWidth="60"/>
+        <Button text="Registrar Disponibilidad" layoutX="170" layoutY="430" onAction="#handleAdministrarHorarios"/>
+
     </children>
 </AnchorPane>

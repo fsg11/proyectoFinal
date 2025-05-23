@@ -11,6 +11,8 @@ import java.util.Optional;
 
 public class PacienteController {
 
+    @FXML
+    private javafx.scene.control.ComboBox<String> comboDisponibilidades;
     // Registro y actualización de datos personales
     @FXML
     private void handleActualizarDatos(ActionEvent event) {
@@ -61,41 +63,66 @@ public class PacienteController {
     private void handleSolicitarCita(ActionEvent event) {
         String pacienteId = pedirDato("Solicitar Cita", "Ingrese su ID de usuario:");
         if (pacienteId == null) return;
-        String medicoId = pedirDato("Solicitar Cita", "Ingrese el ID del médico:");
-        if (medicoId == null) return;
-        String fecha = pedirDato("Solicitar Cita", "Ingrese la fecha de la cita (YYYY-MM-DD):");
-        if (fecha == null) return;
-        String hora = pedirDato("Solicitar Cita", "Ingrese la hora de la cita (HH:MM):");
-        if (hora == null) return;
-        String salaId = pedirDato("Solicitar Cita", "Ingrese el ID de la sala:");
-        if (salaId == null) return;
-        String fechaHora = fecha + "T" + hora;
 
-        // Validar horario del médico
-        boolean horarioValido = false;
-        try (BufferedReader reader = new BufferedReader(new FileReader("horarios.csv"))) {
+        // Si no hay elementos en el ComboBox, pedir el médico y cargar disponibilidades
+        if (comboDisponibilidades.getItems().isEmpty()) {
+            String medicoId = pedirDato("Solicitar Cita", "Ingrese el ID del médico:");
+            if (medicoId == null) return;
+            javafx.collections.ObservableList<String> disponibilidades = javafx.collections.FXCollections.observableArrayList();
+            try (BufferedReader reader = new BufferedReader(new FileReader("disponibilidades.csv"))) {
+                String linea;
+                while ((linea = reader.readLine()) != null) {
+                    String[] datos = linea.split(",");
+                    if (datos.length >= 4 && datos[0].equals(medicoId)) {
+                        disponibilidades.add(datos[1] + " " + datos[2] + " - " + datos[3]);
+                    }
+                }
+            } catch (IOException e) {
+                mostrarAlerta("Error", "No se pudo cargar las disponibilidades.");
+                return;
+            }
+            if (disponibilidades.isEmpty()) {
+                mostrarAlerta("Sin disponibilidad", "El médico no tiene horarios disponibles.");
+                return;
+            }
+            comboDisponibilidades.setItems(disponibilidades);
+            mostrarAlerta("Seleccione disponibilidad", "Seleccione un horario y vuelva a presionar Solicitar Cita.");
+            return;
+        }
+
+        // Si ya hay selección, registrar la cita
+        String seleccion = comboDisponibilidades.getValue();
+        if (seleccion == null) {
+            mostrarAlerta("Seleccione disponibilidad", "Debe seleccionar un horario.");
+            return;
+        }
+        // Parsear la selección: formato "YYYY-MM-DD HH:MM - HH:MM"
+        String[] partes = seleccion.split(" ");
+        String fecha = partes[0];
+        String horaInicio = partes[1];
+        String horaFin = partes[3];
+        String medicoId = null;
+        // Buscar el id del médico correspondiente a la disponibilidad seleccionada
+        try (BufferedReader reader = new BufferedReader(new FileReader("disponibilidades.csv"))) {
             String linea;
             while ((linea = reader.readLine()) != null) {
-                String[] datos = linea.split(",", 2);
-                if (datos.length >= 2 && datos[0].equals(medicoId)) {
-                    String[] horarios = datos[1].split(";");
-                    for (String h : horarios) {
-                        if (h.toLowerCase().contains(obtenerDiaSemana(fecha).toLowerCase()) && h.contains(hora.split(":")[0])) {
-                            horarioValido = true;
-                            break;
-                        }
-                    }
+                String[] datos = linea.split(",");
+                if (datos.length >= 4 && datos[1].equals(fecha) && datos[2].equals(horaInicio) && datos[3].equals(horaFin)) {
+                    medicoId = datos[0];
+                    break;
                 }
             }
         } catch (IOException e) {
-            mostrarAlerta("Error", "No se pudo validar el horario del médico.");
+            mostrarAlerta("Error", "No se pudo validar la disponibilidad.");
             return;
         }
-        if (!horarioValido) {
-            mostrarAlerta("No disponible", "El médico no atiende en ese horario.");
+        if (medicoId == null) {
+            mostrarAlerta("Error", "No se encontró la disponibilidad seleccionada.");
             return;
         }
-
+        String salaId = pedirDato("Solicitar Cita", "Ingrese el ID de la sala:");
+        if (salaId == null) return;
+        String fechaHora = fecha + "T" + horaInicio;
         // Validar que no haya otra cita en ese horario
         try (BufferedReader reader = new BufferedReader(new FileReader("citas.csv"))) {
             String linea;
@@ -110,9 +137,8 @@ public class PacienteController {
             mostrarAlerta("Error", "No se pudo validar la disponibilidad.");
             return;
         }
-
         // Registrar la cita
-        String idCita = pacienteId + "_" + medicoId + "_" + fecha + "_" + hora;
+        String idCita = pacienteId + "_" + medicoId + "_" + fecha + "_" + horaInicio;
         try (FileWriter writer = new FileWriter("citas.csv", true)) {
             writer.append(idCita).append(",")
                     .append(pacienteId).append(",")
@@ -121,15 +147,10 @@ public class PacienteController {
                     .append(salaId).append(",")
                     .append("Programada\n");
             mostrarAlerta("Éxito", "Cita solicitada correctamente.");
+            comboDisponibilidades.getItems().clear(); // Limpiar para futuras solicitudes
         } catch (IOException e) {
             mostrarAlerta("Error", "No se pudo registrar la cita.");
         }
-    }
-
-    // Utilidad para obtener el día de la semana de una fecha (YYYY-MM-DD)
-    private String obtenerDiaSemana(String fecha) {
-        java.time.LocalDate d = java.time.LocalDate.parse(fecha);
-        return d.getDayOfWeek().toString(); // Ej: MONDAY
     }
 
 
