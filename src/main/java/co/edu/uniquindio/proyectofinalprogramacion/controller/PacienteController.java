@@ -239,4 +239,18 @@ public class PacienteController {
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
+
+    @FXML
+    private void handleCerrarSesion(ActionEvent event) {
+        try {
+            javafx.scene.Parent root = javafx.fxml.FXMLLoader.load(getClass().getResource("/co/edu/uniquindio/proyectofinalprogramacion/viewcontroller/Login.fxml"));
+            javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.setTitle("Inicio de Sesión");
+            stage.show();
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo volver al inicio de sesión.");
+        }
+    }
+
 }

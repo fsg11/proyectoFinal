@@ -11,5 +11,6 @@
         <Button text="Cancelar Cita" layoutX="150" layoutY="170" prefWidth="200" onAction="#handleCancelarCita"/>
         <Button text="Consultar Historial Médico" layoutX="150" layoutY="220" prefWidth="200" onAction="#handleConsultarHistorial"/>
         <Button text="Ver Notificaciones" layoutX="150" layoutY="270" prefWidth="200" onAction="#handleVerNotificaciones"/>
+        <Button text="Cerrar sesión" onAction="#handleCerrarSesion"/>
     </children>
 </AnchorPane>

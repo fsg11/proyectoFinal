@@ -10,5 +10,6 @@
         <Button text="Registrar Diagnóstico/Tratamiento" layoutX="150" layoutY="120" prefWidth="200" onAction="#handleRegistrarDiagnostico"/>
         <Button text="Administrar Horarios" layoutX="150" layoutY="170" prefWidth="200" onAction="#handleAdministrarHorarios"/>
         <Button text="Ver Notificaciones de Citas" layoutX="150" layoutY="220" prefWidth="200" onAction="#handleVerNotificaciones"/>
+        <Button text="Cerrar sesión" onAction="#handleCerrarSesion"/>
     </children>
 </AnchorPane>
