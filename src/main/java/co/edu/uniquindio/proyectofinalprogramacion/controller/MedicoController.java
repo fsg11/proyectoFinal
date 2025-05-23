@@ -2,6 +2,8 @@ package co.edu.uniquindio.proyectofinalprogramacion.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import java.util.List;
+import java.util.ArrayList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextInputDialog;
 import java.io.*;
@@ -94,11 +96,41 @@ public class MedicoController {
     // Registro de diagnósticos y tratamientos
     @FXML
     private void handleRegistrarDiagnostico(ActionEvent event) {
-        String pacienteId = pedirDato("Registrar Diagnóstico", "Ingrese el ID del paciente:");
-        if (pacienteId == null) return;
+        // Obtener lista de pacientes
+        List<String> pacientes = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("usuarios.csv"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length >= 5 && datos[4].equals("Paciente")) {
+                    pacientes.add(datos[0] + " - " + datos[1]); // ID - Nombre
+                }
+            }
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo leer la lista de pacientes.");
+            return;
+        }
+        if (pacientes.isEmpty()) {
+            mostrarAlerta("Sin pacientes", "No hay pacientes registrados.");
+            return;
+        }
+
+        // Seleccionar paciente
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(pacientes.get(0), pacientes);
+        dialog.setTitle("Registrar Diagnóstico");
+        dialog.setHeaderText("Seleccione el paciente:");
+        Optional<String> result = dialog.showAndWait();
+        if (!result.isPresent()) return;
+
+        String seleccionado = result.get();
+        String pacienteId = seleccionado.split(" - ")[0];
+
+        // Pedir diagnóstico
         String diagnostico = pedirDato("Registrar Diagnóstico", "Ingrese el diagnóstico o tratamiento:");
         if (diagnostico == null) return;
         String fecha = java.time.LocalDate.now().toString();
+
+        // Guardar en historial
         try (FileWriter writer = new FileWriter("historiales.csv", true)) {
             writer.append(pacienteId).append(",").append(fecha).append(",").append(diagnostico).append("\n");
         } catch (IOException e) {

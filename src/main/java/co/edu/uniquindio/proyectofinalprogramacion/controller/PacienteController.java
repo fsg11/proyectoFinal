@@ -63,6 +63,12 @@ public class PacienteController {
         if (registrarCita(pacienteId, disponibilidad)) {
             mostrarAlerta("Éxito", "Cita solicitada correctamente.");
             comboDisponibilidades.getItems().clear();
+            try (FileWriter notifWriter = new FileWriter("notificaciones.csv", true)) {
+                String mensaje = "El paciente " + pacienteId + " ha solicitado una cita para " + disponibilidad.fecha + " " + disponibilidad.horaInicio;
+                notifWriter.append(java.time.LocalDate.now().toString()).append(",")
+                        .append(disponibilidad.medicoId).append(",")
+                        .append(mensaje).append("\n");
+            } catch (IOException ignored) {}
         } else {
             mostrarAlerta("Error", "No se pudo registrar la cita.");
         }
@@ -128,7 +134,14 @@ public class PacienteController {
             return;
         }
         mostrarAlerta("Éxito", "Cita cancelada correctamente.");
+        try (FileWriter notifWriter = new FileWriter("notificaciones.csv", true)) {
+            String mensaje = "El paciente " + pacienteId + " ha cancelado la cita con ID " + idCitaSeleccionada;
+            notifWriter.append(java.time.LocalDate.now().toString()).append(",")
+                    .append(datosCitas.get(index)[2]).append(",") // ID del médico
+                    .append(mensaje).append("\n");
+        } catch (IOException ignored) {}
     }
+
 
     // Consulta de historial médico
     @FXML
