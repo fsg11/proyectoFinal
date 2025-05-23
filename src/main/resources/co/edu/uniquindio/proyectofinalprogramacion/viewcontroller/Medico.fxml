@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" prefWidth="500" prefHeight="400"
+            fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.MedicoController">
+    <children>
+        <Label text="Panel de Médico" layoutX="180" layoutY="20" style="-fx-font-size: 20px;"/>
+        <Button text="Ver Historiales de Pacientes" layoutX="150" layoutY="70" prefWidth="200" onAction="#handleVerHistoriales"/>
+        <Button text="Registrar Diagnóstico/Tratamiento" layoutX="150" layoutY="120" prefWidth="200" onAction="#handleRegistrarDiagnostico"/>
+        <Button text="Administrar Horarios" layoutX="150" layoutY="170" prefWidth="200" onAction="#handleAdministrarHorarios"/>
+        <Button text="Ver Notificaciones de Citas" layoutX="150" layoutY="220" prefWidth="200" onAction="#handleVerNotificaciones"/>
+    </children>
+</AnchorPane>
