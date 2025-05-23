@@ -64,17 +64,19 @@ public class PacienteController {
         String pacienteId = pedirDato("Solicitar Cita", "Ingrese su ID de usuario:");
         if (pacienteId == null) return;
 
-        // Si no hay elementos en el ComboBox, pedir el médico y cargar disponibilidades
         if (comboDisponibilidades.getItems().isEmpty()) {
             String medicoId = pedirDato("Solicitar Cita", "Ingrese el ID del médico:");
             if (medicoId == null) return;
             javafx.collections.ObservableList<String> disponibilidades = javafx.collections.FXCollections.observableArrayList();
+            java.util.Map<String, String> disponibilidadSalaMap = new java.util.HashMap<>();
             try (BufferedReader reader = new BufferedReader(new FileReader("disponibilidades.csv"))) {
                 String linea;
                 while ((linea = reader.readLine()) != null) {
                     String[] datos = linea.split(",");
-                    if (datos.length >= 4 && datos[0].equals(medicoId)) {
-                        disponibilidades.add(datos[1] + " " + datos[2] + " - " + datos[3]);
+                    if (datos.length >= 5 && datos[0].equals(medicoId)) {
+                        String display = datos[1] + " " + datos[2] + " - " + datos[3];
+                        disponibilidades.add(display);
+                        disponibilidadSalaMap.put(display, datos[4]);
                     }
                 }
             } catch (IOException e) {
@@ -86,29 +88,36 @@ public class PacienteController {
                 return;
             }
             comboDisponibilidades.setItems(disponibilidades);
+            // Guardar el mapa en el ComboBox para uso posterior
+            comboDisponibilidades.setUserData(disponibilidadSalaMap);
             mostrarAlerta("Seleccione disponibilidad", "Seleccione un horario y vuelva a presionar Solicitar Cita.");
             return;
         }
 
-        // Si ya hay selección, registrar la cita
         String seleccion = comboDisponibilidades.getValue();
         if (seleccion == null) {
             mostrarAlerta("Seleccione disponibilidad", "Debe seleccionar un horario.");
             return;
         }
-        // Parsear la selección: formato "YYYY-MM-DD HH:MM - HH:MM"
         String[] partes = seleccion.split(" ");
         String fecha = partes[0];
         String horaInicio = partes[1];
         String horaFin = partes[3];
         String medicoId = null;
+        String salaId = null;
+        // Recuperar el ID de sala del mapa guardado
+        java.util.Map<String, String> disponibilidadSalaMap = (java.util.Map<String, String>) comboDisponibilidades.getUserData();
+        if (disponibilidadSalaMap != null) {
+            salaId = disponibilidadSalaMap.get(seleccion);
+        }
         // Buscar el id del médico correspondiente a la disponibilidad seleccionada
         try (BufferedReader reader = new BufferedReader(new FileReader("disponibilidades.csv"))) {
             String linea;
             while ((linea = reader.readLine()) != null) {
                 String[] datos = linea.split(",");
-                if (datos.length >= 4 && datos[1].equals(fecha) && datos[2].equals(horaInicio) && datos[3].equals(horaFin)) {
+                if (datos.length >= 5 && datos[1].equals(fecha) && datos[2].equals(horaInicio) && datos[3].equals(horaFin)) {
                     medicoId = datos[0];
+                    if (salaId == null) salaId = datos[4];
                     break;
                 }
             }
@@ -116,12 +125,10 @@ public class PacienteController {
             mostrarAlerta("Error", "No se pudo validar la disponibilidad.");
             return;
         }
-        if (medicoId == null) {
+        if (medicoId == null || salaId == null) {
             mostrarAlerta("Error", "No se encontró la disponibilidad seleccionada.");
             return;
         }
-        String salaId = pedirDato("Solicitar Cita", "Ingrese el ID de la sala:");
-        if (salaId == null) return;
         String fechaHora = fecha + "T" + horaInicio;
         // Validar que no haya otra cita en ese horario
         try (BufferedReader reader = new BufferedReader(new FileReader("citas.csv"))) {
@@ -137,7 +144,6 @@ public class PacienteController {
             mostrarAlerta("Error", "No se pudo validar la disponibilidad.");
             return;
         }
-        // Registrar la cita
         String idCita = pacienteId + "_" + medicoId + "_" + fecha + "_" + horaInicio;
         try (FileWriter writer = new FileWriter("citas.csv", true)) {
             writer.append(idCita).append(",")
@@ -147,7 +153,7 @@ public class PacienteController {
                     .append(salaId).append(",")
                     .append("Programada\n");
             mostrarAlerta("Éxito", "Cita solicitada correctamente.");
-            comboDisponibilidades.getItems().clear(); // Limpiar para futuras solicitudes
+            comboDisponibilidades.getItems().clear();
         } catch (IOException e) {
             mostrarAlerta("Error", "No se pudo registrar la cita.");
         }

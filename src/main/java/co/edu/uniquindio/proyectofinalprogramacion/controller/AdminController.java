@@ -121,16 +121,16 @@ public class AdminController {
     }
 
     private void registrarSala() {
-        String datos = pedirDato("Registrar Sala", "Ingrese los datos separados por coma:\nidSala,nombre,horario");
-        if (datos != null && datos.split(",").length == 3) {
+        String idSala = pedirDato("Registrar Sala", "Ingrese el ID de la sala:");
+        if (idSala != null && !idSala.trim().isEmpty()) {
             try (FileWriter writer = new FileWriter("salas.csv", true)) {
-                writer.append(datos).append("\n");
+                writer.append(idSala).append("\n");
                 mostrarAlerta("Éxito", "Sala registrada.");
             } catch (IOException e) {
                 mostrarAlerta("Error", "No se pudo registrar la sala.");
             }
         } else {
-            mostrarAlerta("Error", "Formato incorrecto.");
+            mostrarAlerta("Error", "ID de sala inválido.");
         }
     }
 
