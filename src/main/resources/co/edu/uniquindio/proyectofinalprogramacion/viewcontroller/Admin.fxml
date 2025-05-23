@@ -10,6 +10,7 @@
         <Button text="Gestión de Salas y Horarios" layoutX="100" layoutY="140" prefWidth="300" onAction="#handleGestionSalas"/>
         <Button text="Monitoreo y Asignación de Pacientes" layoutX="100" layoutY="190" prefWidth="300" onAction="#handleMonitoreo"/>
         <Button text="Generar Reportes" layoutX="100" layoutY="240" prefWidth="300" onAction="#handleReportes"/>
+        <Button text="Ver Reporte de Citas" layoutX="100" layoutY="290" prefWidth="300" onAction="#handleVerReporteCitas"/>
         <Button text="Cerrar sesión" onAction="#handleCerrarSesion"/>
     </children>
 </AnchorPane>

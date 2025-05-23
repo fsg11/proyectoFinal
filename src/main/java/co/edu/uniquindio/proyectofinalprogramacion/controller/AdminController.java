@@ -15,17 +15,14 @@ public class AdminController {
     // --- GESTIÓN DE USUARIOS ---
     @FXML
     private void handleGestionUsuarios(ActionEvent event) {
-        List<String> opciones = Arrays.asList("Registrar", "Modificar", "Eliminar");
-        ChoiceDialog<String> dialog = new ChoiceDialog<>("Registrar", opciones);
+        List<String> opciones = Arrays.asList("Modificar", "Eliminar");
+        ChoiceDialog<String> dialog = new ChoiceDialog<>("Modificar", opciones);
         dialog.setTitle("Gestión de Usuarios");
         dialog.setHeaderText("Seleccione una acción");
         Optional<String> result = dialog.showAndWait();
 
         result.ifPresent(accion -> {
             switch (accion) {
-                case "Registrar":
-                    registrarUsuario();
-                    break;
                 case "Modificar":
                     modificarUsuario();
                     break;
@@ -36,25 +33,7 @@ public class AdminController {
         });
     }
 
-    private void registrarUsuario() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Registrar Usuario");
-        dialog.setHeaderText("Ingrese los datos separados por coma:\nusuario,nombre,correo,contraseña,rol");
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(datos -> {
-            String[] partes = datos.split(",");
-            if (partes.length == 5) {
-                try (FileWriter writer = new FileWriter("usuarios.csv", true)) {
-                    writer.append(datos).append("\n");
-                    mostrarAlerta("Éxito", "Usuario registrado.");
-                } catch (IOException e) {
-                    mostrarAlerta("Error", "No se pudo registrar el usuario.");
-                }
-            } else {
-                mostrarAlerta("Error", "Formato incorrecto.");
-            }
-        });
-    }
+
 
     private void modificarUsuario() {
         String usuario = pedirDato("Modificar Usuario", "Ingrese el usuario a modificar:");
@@ -135,32 +114,36 @@ public class AdminController {
     }
 
     private void modificarSala() {
-        String idSala = pedirDato("Modificar Sala", "Ingrese el ID de la sala a modificar:");
-        if (idSala == null) return;
-        List<String[]> salas = leerCSV("salas.csv");
-        Optional<String[]> encontrada = salas.stream().filter(s -> s[0].equals(idSala)).findFirst();
-        if (encontrada.isPresent()) {
-            String[] datos = encontrada.get();
-            String nuevoNombre = pedirDato("Modificar", "Nombre actual: " + datos[1] + "\nNuevo nombre:");
-            String nuevoHorario = pedirDato("Modificar", "Horario actual: " + datos[2] + "\nNuevo horario:");
-            if (nuevoNombre != null && nuevoHorario != null) {
-                datos[1] = nuevoNombre;
-                datos[2] = nuevoHorario;
-                guardarCSV("salas.csv", salas);
-                mostrarAlerta("Éxito", "Sala modificada.");
-            }
-        } else {
-            mostrarAlerta("Error", "Sala no encontrada.");
-        }
+        mostrarAlerta("No disponible", "No es posible modificar una sala. Elimine y registre una nueva si es necesario.");
     }
 
     private void eliminarSala() {
         String idSala = pedirDato("Eliminar Sala", "Ingrese el ID de la sala a eliminar:");
         if (idSala == null) return;
-        List<String[]> salas = leerCSV("salas.csv");
-        boolean eliminado = salas.removeIf(s -> s[0].equals(idSala));
+        List<String> salas = new ArrayList<>();
+        boolean eliminado = false;
+        try (BufferedReader reader = new BufferedReader(new FileReader("salas.csv"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                if (!linea.trim().equals(idSala.trim())) {
+                    salas.add(linea);
+                } else {
+                    eliminado = true;
+                }
+            }
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo leer el archivo de salas.");
+            return;
+        }
         if (eliminado) {
-            guardarCSV("salas.csv", salas);
+            try (FileWriter writer = new FileWriter("salas.csv", false)) {
+                for (String s : salas) {
+                    writer.write(s + "\n");
+                }
+            } catch (IOException e) {
+                mostrarAlerta("Error", "No se pudo guardar el archivo de salas.");
+                return;
+            }
             mostrarAlerta("Éxito", "Sala eliminada.");
         } else {
             mostrarAlerta("Error", "Sala no encontrada.");
@@ -168,33 +151,37 @@ public class AdminController {
     }
 
     private void verSalas() {
-        List<String[]> salas = leerCSV("salas.csv");
-        StringBuilder sb = new StringBuilder();
-        for (String[] s : salas) {
-            sb.append("ID: ").append(s[0]).append(", Nombre: ").append(s[1]).append(", Horario: ").append(s[2]).append("\n");
+        List<String> salas = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("salas.csv"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                if (!linea.trim().isEmpty()) {
+                    salas.add("ID: " + linea.trim());
+                }
+            }
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo leer el archivo de salas.");
+            return;
         }
-        mostrarAlerta("Salas Registradas", sb.length() > 0 ? sb.toString() : "No hay salas registradas.");
+        mostrarAlerta("Salas Registradas", salas.isEmpty() ? "No hay salas registradas." : String.join("\n", salas));
     }
 
     // --- MONITOREO Y ASIGNACIÓN ---
     @FXML
     private void handleMonitoreo(ActionEvent event) {
-        String filtro = pedirDato("Monitorear Citas", "Ingrese ID de médico o paciente (deje vacío para ver todas):");
         StringBuilder sb = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader("citas.csv"))) {
             String linea;
             while ((linea = reader.readLine()) != null) {
                 String[] datos = linea.split(",");
-                if (datos.length >= 6) {
-                    if (filtro == null || filtro.isEmpty() || datos[1].equals(filtro) || datos[2].equals(filtro)) {
-                        sb.append("ID Cita: ").append(datos[0])
-                                .append(", Paciente: ").append(datos[1])
-                                .append(", Médico: ").append(datos[2])
-                                .append(", FechaHora: ").append(datos[3])
-                                .append(", Sala: ").append(datos[4])
-                                .append(", Estado: ").append(datos[5])
-                                .append("\n");
-                    }
+                // Ajusta el número de campos según tu formato de citas.csv
+                if (datos.length >= 5) {
+                    sb.append("ID Cita: ").append(datos[0])
+                            .append(", Paciente: ").append(datos[1])
+                            .append(", Médico: ").append(datos[2])
+                            .append(", FechaHora: ").append(datos[3])
+                            .append(", Estado: ").append(datos[4])
+                            .append("\n");
                 }
             }
         } catch (IOException e) {
@@ -207,14 +194,48 @@ public class AdminController {
     // --- GENERACIÓN DE REPORTES ---
     @FXML
     private void handleReportes(ActionEvent event) {
-        // Simulación: muestra cantidad de citas médicas (lee "citas.csv" si existe)
-        File archivo = new File("citas.csv");
-        if (archivo.exists()) {
-            List<String[]> citas = leerCSV("citas.csv");
-            mostrarAlerta("Reporte de Citas", "Total de citas: " + citas.size());
-        } else {
+        File archivoCitas = new File("citas.csv");
+        if (!archivoCitas.exists()) {
             mostrarAlerta("Reporte de Citas", "No hay citas registradas.");
+            return;
         }
+        try (BufferedReader reader = new BufferedReader(new FileReader(archivoCitas));
+             FileWriter writer = new FileWriter("reporte_citas.txt", false)) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length >= 5) {
+                    writer.write("ID Cita: " + datos[0]
+                            + ", Paciente: " + datos[1]
+                            + ", Médico: " + datos[2]
+                            + ", FechaHora: " + datos[3]
+                            + ", Estado: " + datos[4] + "\n");
+                }
+            }
+            mostrarAlerta("Reporte de Citas", "Reporte generado en 'reporte_citas.txt'.");
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo generar el reporte.");
+        }
+    }
+
+    @FXML
+    private void handleVerReporteCitas(ActionEvent event) {
+        File archivo = new File("reporte_citas.txt");
+        if (!archivo.exists()) {
+            mostrarAlerta("Reporte de Citas", "No existe el archivo de reporte.");
+            return;
+        }
+        StringBuilder contenido = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                contenido.append(linea).append("\n");
+            }
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo leer el reporte.");
+            return;
+        }
+        mostrarAlerta("Reporte de Citas", contenido.length() > 0 ? contenido.toString() : "El reporte está vacío.");
     }
 
     // --- UTILIDADES ---

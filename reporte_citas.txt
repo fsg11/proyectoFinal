@@ -1,0 +1,2 @@
+ID Cita: paciente26_medico26_2025-05-26_08:00, Paciente: paciente26, Médico: medico26, FechaHora: 2025-05-26T08:00, Estado: Cancelada
+ID Cita: paciente26_medico26_2025-05-26_08:00, Paciente: paciente26, Médico: medico26, FechaHora: 2025-05-26T08:00, Estado: Programada
