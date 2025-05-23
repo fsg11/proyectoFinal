@@ -179,15 +179,29 @@ public class AdminController {
     // --- MONITOREO Y ASIGNACIÓN ---
     @FXML
     private void handleMonitoreo(ActionEvent event) {
-        // Simulación: muestra usuarios con rol "Medico" y "Paciente"
-        List<String[]> usuarios = leerCSV("usuarios.csv");
-        StringBuilder sb = new StringBuilder("Médicos disponibles:\n");
-        usuarios.stream().filter(u -> u.length > 4 && u[4].equalsIgnoreCase("Medico"))
-                .forEach(u -> sb.append("- ").append(u[1]).append(" (").append(u[0]).append(")\n"));
-        sb.append("\nPacientes registrados:\n");
-        usuarios.stream().filter(u -> u.length > 4 && u[4].equalsIgnoreCase("Paciente"))
-                .forEach(u -> sb.append("- ").append(u[1]).append(" (").append(u[0]).append(")\n"));
-        mostrarAlerta("Monitoreo", sb.toString());
+        String filtro = pedirDato("Monitorear Citas", "Ingrese ID de médico o paciente (deje vacío para ver todas):");
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader("citas.csv"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length >= 6) {
+                    if (filtro == null || filtro.isEmpty() || datos[1].equals(filtro) || datos[2].equals(filtro)) {
+                        sb.append("ID Cita: ").append(datos[0])
+                                .append(", Paciente: ").append(datos[1])
+                                .append(", Médico: ").append(datos[2])
+                                .append(", FechaHora: ").append(datos[3])
+                                .append(", Sala: ").append(datos[4])
+                                .append(", Estado: ").append(datos[5])
+                                .append("\n");
+                    }
+                }
+            }
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo leer el archivo de citas.");
+            return;
+        }
+        mostrarAlerta("Citas", sb.length() > 0 ? sb.toString() : "No hay citas registradas.");
     }
 
     // --- GENERACIÓN DE REPORTES ---

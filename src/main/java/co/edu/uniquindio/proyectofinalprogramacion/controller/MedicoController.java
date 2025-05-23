@@ -54,9 +54,9 @@ public class MedicoController {
     private void handleAdministrarHorarios(ActionEvent event) {
         String medicoId = pedirDato("Horarios", "Ingrese su ID de médico:");
         if (medicoId == null) return;
-        String horario = pedirDato("Horarios", "Ingrese el nuevo horario (ej: Lunes 8-12):");
-        if (horario == null) return;
-        // Guardar o actualizar horario
+        String horarios = pedirDato("Horarios", "Ingrese los horarios disponibles separados por punto y coma (ej: Lunes 8-12;Martes 14-18):");
+        if (horarios == null) return;
+
         File archivo = new File("horarios.csv");
         boolean actualizado = false;
         StringBuilder nuevosHorarios = new StringBuilder();
@@ -64,9 +64,9 @@ public class MedicoController {
             if (reader != null) {
                 String linea;
                 while ((linea = reader.readLine()) != null) {
-                    String[] datos = linea.split(",");
+                    String[] datos = linea.split(",", 2);
                     if (datos.length >= 2 && datos[0].equals(medicoId)) {
-                        nuevosHorarios.append(medicoId).append(",").append(horario).append("\n");
+                        nuevosHorarios.append(medicoId).append(",").append(horarios).append("\n");
                         actualizado = true;
                     } else {
                         nuevosHorarios.append(linea).append("\n");
@@ -75,9 +75,9 @@ public class MedicoController {
             }
         } catch (IOException ignored) {}
         if (!actualizado) {
-            nuevosHorarios.append(medicoId).append(",").append(horario).append("\n");
+            nuevosHorarios.append(medicoId).append(",").append(horarios).append("\n");
         }
-        try (FileWriter writer = new FileWriter("horarios.csv", false)) {
+        try (FileWriter writer = new FileWriter(archivo, false)) {
             writer.write(nuevosHorarios.toString());
         } catch (IOException e) {
             mostrarAlerta("Error", "No se pudo guardar el horario.");
@@ -85,6 +85,7 @@ public class MedicoController {
         }
         mostrarAlerta("Éxito", "Horario actualizado.");
     }
+
 
     // Notificación de cambios en las citas
     @FXML

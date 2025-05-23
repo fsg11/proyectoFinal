@@ -69,12 +69,55 @@ public class PacienteController {
         if (hora == null) return;
         String salaId = pedirDato("Solicitar Cita", "Ingrese el ID de la sala:");
         if (salaId == null) return;
+        String fechaHora = fecha + "T" + hora;
+
+        // Validar horario del médico
+        boolean horarioValido = false;
+        try (BufferedReader reader = new BufferedReader(new FileReader("horarios.csv"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                String[] datos = linea.split(",", 2);
+                if (datos.length >= 2 && datos[0].equals(medicoId)) {
+                    String[] horarios = datos[1].split(";");
+                    for (String h : horarios) {
+                        if (h.toLowerCase().contains(obtenerDiaSemana(fecha).toLowerCase()) && h.contains(hora.split(":")[0])) {
+                            horarioValido = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo validar el horario del médico.");
+            return;
+        }
+        if (!horarioValido) {
+            mostrarAlerta("No disponible", "El médico no atiende en ese horario.");
+            return;
+        }
+
+        // Validar que no haya otra cita en ese horario
+        try (BufferedReader reader = new BufferedReader(new FileReader("citas.csv"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length >= 6 && datos[2].equals(medicoId) && datos[3].equals(fechaHora) && datos[5].equals("Programada")) {
+                    mostrarAlerta("No disponible", "El médico ya tiene una cita programada en esa fecha y hora.");
+                    return;
+                }
+            }
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo validar la disponibilidad.");
+            return;
+        }
+
+        // Registrar la cita
         String idCita = pacienteId + "_" + medicoId + "_" + fecha + "_" + hora;
         try (FileWriter writer = new FileWriter("citas.csv", true)) {
             writer.append(idCita).append(",")
                     .append(pacienteId).append(",")
                     .append(medicoId).append(",")
-                    .append(fecha).append("T").append(hora).append(",")
+                    .append(fechaHora).append(",")
                     .append(salaId).append(",")
                     .append("Programada\n");
             mostrarAlerta("Éxito", "Cita solicitada correctamente.");
@@ -82,6 +125,13 @@ public class PacienteController {
             mostrarAlerta("Error", "No se pudo registrar la cita.");
         }
     }
+
+    // Utilidad para obtener el día de la semana de una fecha (YYYY-MM-DD)
+    private String obtenerDiaSemana(String fecha) {
+        java.time.LocalDate d = java.time.LocalDate.parse(fecha);
+        return d.getDayOfWeek().toString(); // Ej: MONDAY
+    }
+
 
     // Cancelación de cita médica
     @FXML
