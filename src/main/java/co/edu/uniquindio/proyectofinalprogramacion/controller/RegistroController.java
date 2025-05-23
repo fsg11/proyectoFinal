@@ -7,6 +7,11 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import java.io.FileWriter;
 import java.io.IOException;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.scene.Node;
 
 public class RegistroController {
     @FXML private TextField usuarioField;
@@ -37,6 +42,16 @@ public class RegistroController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // Aquí puedes redirigir a la pantalla de login si lo deseas
+
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/co/edu/uniquindio/proyectofinalprogramacion/viewcontroller/Login.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Sistema de Gestión Hospitalaria - Login");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" prefWidth="500" prefHeight="400"
+            fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.AdminController">
+    <children>
+        <Label text="Panel de Administrador" layoutX="150" layoutY="30" style="-fx-font-size: 20px;"/>
+        <Button text="Registrar/Modificar/Eliminar Médicos y Pacientes" layoutX="100" layoutY="90" prefWidth="300" onAction="#handleGestionUsuarios"/>
+        <Button text="Gestión de Salas y Horarios" layoutX="100" layoutY="140" prefWidth="300" onAction="#handleGestionSalas"/>
+        <Button text="Monitoreo y Asignación de Pacientes" layoutX="100" layoutY="190" prefWidth="300" onAction="#handleMonitoreo"/>
+        <Button text="Generar Reportes" layoutX="100" layoutY="240" prefWidth="300" onAction="#handleReportes"/>
+    </children>
+</AnchorPane>

@@ -14,6 +14,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+
+
 public class LoginController {
     @FXML private TextField usuarioField;
     @FXML private PasswordField contrasenaField;
@@ -28,13 +30,13 @@ public class LoginController {
             return;
         }
 
-        boolean encontrado = false;
+        String rol = null;
         try (BufferedReader reader = new BufferedReader(new FileReader("usuarios.csv"))) {
             String linea;
             while ((linea = reader.readLine()) != null) {
                 String[] datos = linea.split(",");
-                if (datos.length >= 4 && datos[0].equals(usuario) && datos[3].equals(contrasena)) {
-                    encontrado = true;
+                if (datos.length >= 5 && datos[0].equals(usuario) && datos[3].equals(contrasena)) {
+                    rol = datos[4];
                     break;
                 }
             }
@@ -43,9 +45,31 @@ public class LoginController {
             return;
         }
 
-        if (encontrado) {
-            mostrarAlerta("Éxito", "Inicio de sesión exitoso.");
-            // Aquí puedes cargar la siguiente pantalla según el rol si lo deseas
+        if (rol != null) {
+            String fxml = null;
+            switch (rol) {
+                case "Admin":
+                    fxml = "/co/edu/uniquindio/proyectofinalprogramacion/viewcontroller/Admin.fxml";
+                    break;
+                case "Medico":
+                    fxml = "/co/edu/uniquindio/proyectofinalprogramacion/viewcontroller/Medico.fxml";
+                    break;
+                case "Paciente":
+                    fxml = "/co/edu/uniquindio/proyectofinalprogramacion/viewcontroller/Paciente.fxml";
+                    break;
+                default:
+                    mostrarAlerta("Error", "Rol no reconocido.");
+                    return;
+            }
+            try {
+                Parent root = FXMLLoader.load(getClass().getResource(fxml));
+                Stage stage = (Stage) usuarioField.getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Panel " + rol);
+                stage.show();
+            } catch (IOException e) {
+                mostrarAlerta("Error", "No se pudo cargar la vista del rol.");
+            }
         } else {
             mostrarAlerta("Error", "Usuario o contraseña incorrectos.");
         }
