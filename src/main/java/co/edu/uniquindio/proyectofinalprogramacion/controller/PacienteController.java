@@ -216,8 +216,8 @@ public class PacienteController {
             String linea;
             while ((linea = reader.readLine()) != null) {
                 String[] datos = linea.split(",");
-                if (datos.length >= 4 && datos[0].trim().equals(medicoId.trim())) {
-                    lista.add(new Disponibilidad(datos[0].trim(), datos[1].trim(), datos[2].trim(), datos[3].trim()));
+                if (datos.length >= 5 && datos[0].trim().equals(medicoId.trim())) {
+                    lista.add(new Disponibilidad(datos[0].trim(), datos[1].trim(), datos[2].trim(), datos[3].trim(), datos[4].trim()));
                 }
             }
         } catch (IOException ignored) {}
@@ -229,8 +229,8 @@ public class PacienteController {
             String linea;
             while ((linea = reader.readLine()) != null) {
                 String[] datos = linea.split(",");
-                if (datos.length >= 4) {
-                    Disponibilidad d = new Disponibilidad(datos[0].trim(), datos[1].trim(), datos[2].trim(), datos[3].trim());
+                if (datos.length >= 5) {
+                    Disponibilidad d = new Disponibilidad(datos[0].trim(), datos[1].trim(), datos[2].trim(), datos[3].trim(), datos[4].trim());
                     if (d.toDisplayString().equals(display)) {
                         return Optional.of(d);
                     }
@@ -274,12 +274,12 @@ public class PacienteController {
 
     // --- Clase interna para disponibilidad ---
     private static class Disponibilidad {
-        String medicoId, fecha, horaInicio, horaFin;
-        Disponibilidad(String m, String f, String hi, String hf) {
-            medicoId = m; fecha = f; horaInicio = hi; horaFin = hf;
+        String medicoId, fecha, horaInicio, horaFin, salaId;
+        Disponibilidad(String m, String f, String hi, String hf, String s) {
+            medicoId = m; fecha = f; horaInicio = hi; horaFin = hf; salaId = s;
         }
         String toDisplayString() {
-            return fecha + " " + horaInicio + " - " + horaFin;
+            return fecha + " " + horaInicio + " - " + horaFin + " | Sala: " + salaId;
         }
     }
 

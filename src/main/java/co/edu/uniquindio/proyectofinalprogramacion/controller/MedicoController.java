@@ -27,6 +27,8 @@ import javafx.scene.control.ChoiceDialog;
 public class MedicoController {
 
     @FXML
+    private javafx.scene.control.ComboBox<String> comboSalas;
+    @FXML
     private DatePicker datePickerDisponibilidad;
     @FXML
     private Spinner<Integer> spinnerHoraInicio;
@@ -43,6 +45,20 @@ public class MedicoController {
         spinnerMinutoInicio.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0, 15));
         spinnerHoraFin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(6, 22, 9));
         spinnerMinutoFin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0, 15));
+        cargarSalas();
+
+    }
+
+    private void cargarSalas() {
+        comboSalas.getItems().clear();
+        try (BufferedReader reader = new BufferedReader(new FileReader("salas.csv"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                if (!linea.trim().isEmpty()) {
+                    comboSalas.getItems().add(linea.trim());
+                }
+            }
+        } catch (IOException ignored) {}
     }
 
     @FXML
@@ -54,7 +70,8 @@ public class MedicoController {
         int minutoInicio = spinnerMinutoInicio.getValue();
         int horaFin = spinnerHoraFin.getValue();
         int minutoFin = spinnerMinutoFin.getValue();
-        if (fecha == null) {
+        String salaId = comboSalas.getValue();
+        if (fecha == null || salaId == null) {
             mostrarAlerta("Error", "Complete todos los campos.");
             return;
         }
@@ -64,7 +81,8 @@ public class MedicoController {
             writer.append(medicoId).append(",")
                     .append(fecha.toString()).append(",")
                     .append(horaInicioStr).append(",")
-                    .append(horaFinStr).append("\n");
+                    .append(horaFinStr).append(",")
+                    .append(salaId).append("\n");
             mostrarAlerta("Éxito", "Disponibilidad registrada.");
         } catch (IOException e) {
             mostrarAlerta("Error", "No se pudo registrar la disponibilidad.");

@@ -19,6 +19,8 @@
         <Label text="Hora fin:" layoutX="100" layoutY="390"/>
         <Spinner fx:id="spinnerHoraFin" layoutX="170" layoutY="385" prefWidth="80"/>
         <Spinner fx:id="spinnerMinutoFin" layoutX="240" layoutY="385" prefWidth="60"/>
+        <Label text="Sala:" layoutX="100" layoutY="410"/>
+        <ComboBox fx:id="comboSalas" layoutX="150" layoutY="405" prefWidth="200"/>
         <Button text="Registrar Disponibilidad" layoutX="170" layoutY="430" onAction="#handleAdministrarHorarios"/>
 
     </children>
