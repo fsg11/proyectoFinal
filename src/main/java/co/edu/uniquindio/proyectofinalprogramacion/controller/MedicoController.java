@@ -56,39 +56,13 @@ public class MedicoController {
             mostrarAlerta("Error", "Complete todos los campos.");
             return;
         }
-        // Leer salas disponibles
-        java.util.List<String> salas = new java.util.ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("salas.csv"))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                String[] datos = linea.split(",");
-                if (datos.length >= 1) {
-                    salas.add(datos[0]);
-                }
-            }
-        } catch (IOException e) {
-            mostrarAlerta("Error", "No se pudieron cargar las salas.");
-            return;
-        }
-        if (salas.isEmpty()) {
-            mostrarAlerta("Error", "No hay salas registradas.");
-            return;
-        }
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(salas.get(0), salas);
-        dialog.setTitle("Seleccionar Sala");
-        dialog.setHeaderText("Seleccione la sala para la disponibilidad:");
-        java.util.Optional<String> result = dialog.showAndWait();
-        if (!result.isPresent()) return;
-        String salaId = result.get();
-
-        java.time.LocalTime inicio = java.time.LocalTime.of(horaInicio, minutoInicio);
-        java.time.LocalTime fin = java.time.LocalTime.of(horaFin, minutoFin);
+        String horaInicioStr = String.format("%02d:%02d", horaInicio, minutoInicio);
+        String horaFinStr = String.format("%02d:%02d", horaFin, minutoFin);
         try (FileWriter writer = new FileWriter("disponibilidades.csv", true)) {
             writer.append(medicoId).append(",")
                     .append(fecha.toString()).append(",")
-                    .append(inicio.toString()).append(",")
-                    .append(fin.toString()).append(",")
-                    .append(salaId).append("\n");
+                    .append(horaInicioStr).append(",")
+                    .append(horaFinStr).append("\n");
             mostrarAlerta("Éxito", "Disponibilidad registrada.");
         } catch (IOException e) {
             mostrarAlerta("Error", "No se pudo registrar la disponibilidad.");

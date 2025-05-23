@@ -4,61 +4,21 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextInputDialog;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.io.*;
-import java.time.LocalDate;
-import java.util.Optional;
+import java.util.*;
+import javafx.scene.control.ChoiceDialog;
 
 public class PacienteController {
 
+    private static final String DISPONIBILIDADES_CSV = "disponibilidades.csv";
+    private static final String CITAS_CSV = "citas.csv";
+
     @FXML
     private javafx.scene.control.ComboBox<String> comboDisponibilidades;
-    // Registro y actualización de datos personales
-    @FXML
-    private void handleActualizarDatos(ActionEvent event) {
-        String pacienteId = pedirDato("Actualizar Datos", "Ingrese su ID de usuario:");
-        if (pacienteId == null) return;
-        try {
-            File archivo = new File("usuarios.csv");
-            if (!archivo.exists()) archivo.createNewFile();
-            BufferedReader reader = new BufferedReader(new FileReader(archivo));
-            StringBuilder nuevosUsuarios = new StringBuilder();
-            String linea;
-            boolean actualizado = false;
-            while ((linea = reader.readLine()) != null) {
-                String[] datos = linea.split(",");
-                if (datos.length >= 5 && datos[0].equals(pacienteId) && datos[4].equalsIgnoreCase("Paciente")) {
-                    String nuevoNombre = pedirDato("Actualizar", "Nombre actual: " + datos[1] + "\nNuevo nombre:");
-                    String nuevoCorreo = pedirDato("Actualizar", "Correo actual: " + datos[2] + "\nNuevo correo:");
-                    String nuevaContrasena = pedirDato("Actualizar", "Contraseña actual: " + datos[3] + "\nNueva contraseña:");
-                    if (nuevoNombre != null && nuevoCorreo != null && nuevaContrasena != null) {
-                        nuevosUsuarios.append(pacienteId).append(",")
-                                .append(nuevoNombre).append(",")
-                                .append(nuevoCorreo).append(",")
-                                .append(nuevaContrasena).append(",Paciente\n");
-                        actualizado = true;
-                    } else {
-                        nuevosUsuarios.append(linea).append("\n");
-                    }
-                } else {
-                    nuevosUsuarios.append(linea).append("\n");
-                }
-            }
-            reader.close();
-            FileWriter writer = new FileWriter(archivo, false);
-            writer.write(nuevosUsuarios.toString());
-            writer.close();
-            if (actualizado) {
-                mostrarAlerta("Éxito", "Datos actualizados.");
-            } else {
-                mostrarAlerta("Error", "Paciente no encontrado.");
-            }
-        } catch (IOException e) {
-            mostrarAlerta("Error", "No se pudo actualizar la información.");
-        }
-    }
 
-    // Solicitud de cita médica
     @FXML
     private void handleSolicitarCita(ActionEvent event) {
         String pacienteId = pedirDato("Solicitar Cita", "Ingrese su ID de usuario:");
@@ -67,29 +27,17 @@ public class PacienteController {
         if (comboDisponibilidades.getItems().isEmpty()) {
             String medicoId = pedirDato("Solicitar Cita", "Ingrese el ID del médico:");
             if (medicoId == null) return;
-            javafx.collections.ObservableList<String> disponibilidades = javafx.collections.FXCollections.observableArrayList();
-            java.util.Map<String, String> disponibilidadSalaMap = new java.util.HashMap<>();
-            try (BufferedReader reader = new BufferedReader(new FileReader("disponibilidades.csv"))) {
-                String linea;
-                while ((linea = reader.readLine()) != null) {
-                    String[] datos = linea.split(",");
-                    if (datos.length >= 5 && datos[0].equals(medicoId)) {
-                        String display = datos[1] + " " + datos[2] + " - " + datos[3];
-                        disponibilidades.add(display);
-                        disponibilidadSalaMap.put(display, datos[4]);
-                    }
-                }
-            } catch (IOException e) {
-                mostrarAlerta("Error", "No se pudo cargar las disponibilidades.");
-                return;
-            }
-            if (disponibilidades.isEmpty()) {
+
+            List<Disponibilidad> lista = cargarDisponibilidadesPorMedico(medicoId);
+            if (lista.isEmpty()) {
                 mostrarAlerta("Sin disponibilidad", "El médico no tiene horarios disponibles.");
                 return;
             }
-            comboDisponibilidades.setItems(disponibilidades);
-            // Guardar el mapa en el ComboBox para uso posterior
-            comboDisponibilidades.setUserData(disponibilidadSalaMap);
+            ObservableList<String> opciones = FXCollections.observableArrayList();
+            for (Disponibilidad d : lista) {
+                opciones.add(d.toDisplayString());
+            }
+            comboDisponibilidades.setItems(opciones);
             mostrarAlerta("Seleccione disponibilidad", "Seleccione un horario y vuelva a presionar Solicitar Cita.");
             return;
         }
@@ -99,103 +47,87 @@ public class PacienteController {
             mostrarAlerta("Seleccione disponibilidad", "Debe seleccionar un horario.");
             return;
         }
-        String[] partes = seleccion.split(" ");
-        String fecha = partes[0];
-        String horaInicio = partes[1];
-        String horaFin = partes[3];
-        String medicoId = null;
-        String salaId = null;
-        // Recuperar el ID de sala del mapa guardado
-        java.util.Map<String, String> disponibilidadSalaMap = (java.util.Map<String, String>) comboDisponibilidades.getUserData();
-        if (disponibilidadSalaMap != null) {
-            salaId = disponibilidadSalaMap.get(seleccion);
-        }
-        // Buscar el id del médico correspondiente a la disponibilidad seleccionada
-        try (BufferedReader reader = new BufferedReader(new FileReader("disponibilidades.csv"))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                String[] datos = linea.split(",");
-                if (datos.length >= 5 && datos[1].equals(fecha) && datos[2].equals(horaInicio) && datos[3].equals(horaFin)) {
-                    medicoId = datos[0];
-                    if (salaId == null) salaId = datos[4];
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            mostrarAlerta("Error", "No se pudo validar la disponibilidad.");
-            return;
-        }
-        if (medicoId == null || salaId == null) {
+
+        Optional<Disponibilidad> disponibilidadOpt = buscarDisponibilidadPorDisplay(seleccion);
+        if (!disponibilidadOpt.isPresent()) {
             mostrarAlerta("Error", "No se encontró la disponibilidad seleccionada.");
             return;
         }
-        String fechaHora = fecha + "T" + horaInicio;
-        // Validar que no haya otra cita en ese horario
-        try (BufferedReader reader = new BufferedReader(new FileReader("citas.csv"))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                String[] datos = linea.split(",");
-                if (datos.length >= 6 && datos[2].equals(medicoId) && datos[3].equals(fechaHora) && datos[5].equals("Programada")) {
-                    mostrarAlerta("No disponible", "El médico ya tiene una cita programada en esa fecha y hora.");
-                    return;
-                }
-            }
-        } catch (IOException e) {
-            mostrarAlerta("Error", "No se pudo validar la disponibilidad.");
+        Disponibilidad disponibilidad = disponibilidadOpt.get();
+
+        if (verificarConflictoCita(disponibilidad)) {
+            mostrarAlerta("No disponible", "El médico ya tiene una cita programada en esa fecha y hora.");
             return;
         }
-        String idCita = pacienteId + "_" + medicoId + "_" + fecha + "_" + horaInicio;
-        try (FileWriter writer = new FileWriter("citas.csv", true)) {
-            writer.append(idCita).append(",")
-                    .append(pacienteId).append(",")
-                    .append(medicoId).append(",")
-                    .append(fechaHora).append(",")
-                    .append(salaId).append(",")
-                    .append("Programada\n");
+
+        if (registrarCita(pacienteId, disponibilidad)) {
             mostrarAlerta("Éxito", "Cita solicitada correctamente.");
             comboDisponibilidades.getItems().clear();
-        } catch (IOException e) {
+        } else {
             mostrarAlerta("Error", "No se pudo registrar la cita.");
         }
     }
-
 
     // Cancelación de cita médica
     @FXML
     private void handleCancelarCita(ActionEvent event) {
         String pacienteId = pedirDato("Cancelar Cita", "Ingrese su ID de usuario:");
         if (pacienteId == null) return;
-        String idCita = pedirDato("Cancelar Cita", "Ingrese el ID de la cita a cancelar:");
-        if (idCita == null) return;
-        File archivo = new File("citas.csv");
-        boolean cancelada = false;
-        StringBuilder nuevasCitas = new StringBuilder();
-        try (BufferedReader reader = archivo.exists() ? new BufferedReader(new FileReader(archivo)) : null) {
-            if (reader != null) {
-                String linea;
-                while ((linea = reader.readLine()) != null) {
-                    String[] datos = linea.split(",");
-                    if (datos.length >= 6 && datos[0].equals(idCita) && datos[1].equals(pacienteId) && datos[5].equals("Programada")) {
-                        datos[5] = "Cancelada";
-                        nuevasCitas.append(String.join(",", datos)).append("\n");
-                        cancelada = true;
-                    } else {
-                        nuevasCitas.append(linea).append("\n");
-                    }
+
+        List<String> citas = new ArrayList<>();
+        List<String[]> datosCitas = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("citas.csv"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length >= 5 && datos[1].equals(pacienteId) && datos[4].equals("Programada")) {
+                    citas.add("ID: " + datos[0] + " | Médico: " + datos[2] + " | Fecha: " + datos[3]);
+                    datosCitas.add(datos);
                 }
             }
-        } catch (IOException ignored) {}
-        try (FileWriter writer = new FileWriter(archivo, false)) {
-            writer.write(nuevasCitas.toString());
         } catch (IOException e) {
-            mostrarAlerta("Error", "No se pudo cancelar la cita.");
+            mostrarAlerta("Error", "No se pudo leer el archivo de citas.");
             return;
         }
-        if (cancelada) {
-            mostrarAlerta("Éxito", "Cita cancelada.");
-        } else {
-            mostrarAlerta("Error", "Cita no encontrada o ya cancelada.");
+
+        if (citas.isEmpty()) {
+            mostrarAlerta("Sin citas", "No tienes citas programadas.");
+            return;
         }
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(citas.get(0), citas);
+        dialog.setTitle("Cancelar Cita");
+        dialog.setHeaderText("Selecciona la cita a cancelar:");
+        Optional<String> result = dialog.showAndWait();
+        if (!result.isPresent()) return;
+
+        int index = citas.indexOf(result.get());
+        String idCitaSeleccionada = datosCitas.get(index)[0];
+
+        // Actualizar archivo
+        StringBuilder nuevasCitas = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader("citas.csv"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length >= 5 && datos[0].equals(idCitaSeleccionada)) {
+                    datos[4] = "Cancelada";
+                    nuevasCitas.append(String.join(",", datos)).append("\n");
+                } else {
+                    nuevasCitas.append(linea).append("\n");
+                }
+            }
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo actualizar la cita.");
+            return;
+        }
+        try (FileWriter writer = new FileWriter("citas.csv", false)) {
+            writer.write(nuevasCitas.toString());
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo guardar la cancelación.");
+            return;
+        }
+        mostrarAlerta("Éxito", "Cita cancelada correctamente.");
     }
 
     // Consulta de historial médico
@@ -229,42 +161,25 @@ public class PacienteController {
     private void handleVerNotificaciones(ActionEvent event) {
         String pacienteId = pedirDato("Notificaciones", "Ingrese su ID de usuario:");
         if (pacienteId == null) return;
-        File archivo = new File("notificaciones.csv");
-        StringBuilder notificaciones = new StringBuilder();
-        try {
-            if (!archivo.exists()) archivo.createNewFile();
-            BufferedReader reader = new BufferedReader(new FileReader(archivo));
+
+        StringBuilder historial = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader("citas.csv"))) {
             String linea;
             while ((linea = reader.readLine()) != null) {
                 String[] datos = linea.split(",");
-                if (datos.length >= 3 && datos[1].equals(pacienteId)) {
-                    notificaciones.append("Fecha: ").append(datos[0])
-                            .append("\nMensaje: ").append(datos[2]).append("\n\n");
+                if (datos.length >= 5 && datos[1].equals(pacienteId)) {
+                    historial.append("ID: ").append(datos[0])
+                            .append("\nMédico: ").append(datos[2])
+                            .append("\nFecha: ").append(datos[3])
+                            .append("\nEstado: ").append(datos[4])
+                            .append("\n\n");
                 }
             }
-            reader.close();
         } catch (IOException e) {
-            mostrarAlerta("Error", "No se pudo leer las notificaciones.");
+            mostrarAlerta("Error", "No se pudo leer el historial de citas.");
             return;
         }
-        mostrarAlerta("Notificaciones", notificaciones.length() > 0 ? notificaciones.toString() : "No hay notificaciones.");
-    }
-
-    // Utilidades
-    private String pedirDato(String titulo, String mensaje) {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle(titulo);
-        dialog.setHeaderText(mensaje);
-        Optional<String> result = dialog.showAndWait();
-        return result.orElse(null);
-    }
-
-    private void mostrarAlerta(String titulo, String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
+        mostrarAlerta("Historial de Citas", historial.length() > 0 ? historial.toString() : "No hay citas registradas.");
     }
 
     @FXML
@@ -280,4 +195,143 @@ public class PacienteController {
         }
     }
 
+    // --- Métodos auxiliares ---
+
+    private List<Disponibilidad> cargarDisponibilidadesPorMedico(String medicoId) {
+        List<Disponibilidad> lista = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(DISPONIBILIDADES_CSV))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length >= 4 && datos[0].trim().equals(medicoId.trim())) {
+                    lista.add(new Disponibilidad(datos[0].trim(), datos[1].trim(), datos[2].trim(), datos[3].trim()));
+                }
+            }
+        } catch (IOException ignored) {}
+        return lista;
+    }
+
+    private Optional<Disponibilidad> buscarDisponibilidadPorDisplay(String display) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(DISPONIBILIDADES_CSV))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length >= 4) {
+                    Disponibilidad d = new Disponibilidad(datos[0].trim(), datos[1].trim(), datos[2].trim(), datos[3].trim());
+                    if (d.toDisplayString().equals(display)) {
+                        return Optional.of(d);
+                    }
+                }
+            }
+        } catch (IOException ignored) {}
+        return Optional.empty();
+    }
+
+    private boolean verificarConflictoCita(Disponibilidad d) {
+        String fechaHora = d.fecha + "T" + d.horaInicio;
+        try (BufferedReader reader = new BufferedReader(new FileReader(CITAS_CSV))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length >= 5 &&
+                        datos[2].trim().equals(d.medicoId) &&
+                        datos[3].trim().equals(fechaHora) &&
+                        datos[4].trim().equals("Programada")) {
+                    return true;
+                }
+            }
+        } catch (IOException ignored) {}
+        return false;
+    }
+
+    private boolean registrarCita(String pacienteId, Disponibilidad d) {
+        String idCita = pacienteId + "_" + d.medicoId + "_" + d.fecha + "_" + d.horaInicio;
+        String fechaHora = d.fecha + "T" + d.horaInicio;
+        try (FileWriter writer = new FileWriter(CITAS_CSV, true)) {
+            writer.append(idCita).append(",")
+                    .append(pacienteId).append(",")
+                    .append(d.medicoId).append(",")
+                    .append(fechaHora).append(",")
+                    .append("Programada\n");
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    // --- Clase interna para disponibilidad ---
+    private static class Disponibilidad {
+        String medicoId, fecha, horaInicio, horaFin;
+        Disponibilidad(String m, String f, String hi, String hf) {
+            medicoId = m; fecha = f; horaInicio = hi; horaFin = hf;
+        }
+        String toDisplayString() {
+            return fecha + " " + horaInicio + " - " + horaFin;
+        }
+    }
+
+    // --- Utilidades ---
+    private String pedirDato(String titulo, String mensaje) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle(titulo);
+        dialog.setHeaderText(mensaje);
+        Optional<String> result = dialog.showAndWait();
+        return result.orElse(null);
+    }
+
+    @FXML
+    private void handleActualizarDatos(ActionEvent event) {
+        String pacienteId = pedirDato("Actualizar Datos", "Ingrese su ID de usuario:");
+        if (pacienteId == null) return;
+
+        String nuevoNombre = pedirDato("Actualizar Datos", "Ingrese su nuevo nombre:");
+        if (nuevoNombre == null) return;
+
+        String nuevoCorreo = pedirDato("Actualizar Datos", "Ingrese su nuevo correo:");
+        if (nuevoCorreo == null) return;
+
+        String nuevaContrasena = pedirDato("Actualizar Datos", "Ingrese su nueva contraseña:");
+        if (nuevaContrasena == null) return;
+
+        boolean actualizado = false;
+        StringBuilder nuevosUsuarios = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader("usuarios.csv"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length >= 5 && datos[0].equals(pacienteId) && datos[4].equals("Paciente")) {
+                    nuevosUsuarios.append(pacienteId).append(",")
+                            .append(nuevoNombre).append(",")
+                            .append(nuevoCorreo).append(",")
+                            .append(nuevaContrasena).append(",")
+                            .append("Paciente\n");
+                    actualizado = true;
+                } else {
+                    nuevosUsuarios.append(linea).append("\n");
+                }
+            }
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo leer el archivo de usuarios.");
+            return;
+        }
+        try (FileWriter writer = new FileWriter("usuarios.csv", false)) {
+            writer.write(nuevosUsuarios.toString());
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo actualizar el usuario.");
+            return;
+        }
+        if (actualizado) {
+            mostrarAlerta("Éxito", "Datos actualizados correctamente.");
+        } else {
+            mostrarAlerta("Error", "No se encontró el usuario o no es paciente.");
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
 }
