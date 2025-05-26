@@ -6,14 +6,14 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="250" prefWidth="400" style="-fx-background-color: #fbe3e3; -fx-border-color: #D29BEF;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.LoginController">
+<AnchorPane prefHeight="250" prefWidth="400" style="-fx-background-color: #fbe3e3; -fx-border-color: #D29BEF;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.LoginController">
     <children>
         <Label layoutX="150" layoutY="30" style="-fx-font-size: 18px;" text="Iniciar Sesión" />
         <Label layoutX="70" layoutY="90" text="Usuario:" />
         <TextField fx:id="usuarioField" layoutX="140" layoutY="85" prefWidth="180" />
         <Label layoutX="50" layoutY="130" text="Contraseña:" />
         <PasswordField fx:id="contrasenaField" layoutX="140" layoutY="125" prefWidth="180" />
-        <Button layoutX="140.0" layoutY="180.0" onAction="#handleLogin" prefWidth="80" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Ingresar" />
-        <Button layoutX="255.0" layoutY="180.0" onAction="#handleRegistro" prefWidth="100" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Registrarme" />
+        <Button layoutX="140.0" layoutY="180.0" onAction="#handleLogin" prefWidth="80" style="-fx-background-color: #bceeff; -fx-border-color: #D29BEF;" text="Ingresar" />
+        <Button layoutX="255.0" layoutY="180.0" onAction="#handleRegistro" prefWidth="100" style="-fx-background-color: #bceeff; -fx-border-color: #D29BEF;" text="Registrarme" />
     </children>
 </AnchorPane>
