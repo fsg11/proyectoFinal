@@ -2,18 +2,16 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="250" prefWidth="400" style="-fx-background-color: #fbe3e3; -fx-border-color: #D29BEF;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.LoginController">
+<AnchorPane prefHeight="400" prefWidth="500" style="-fx-background-color: #fbe3e3; -fx-border-color: #D29BEF;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.AdminController">
     <children>
-        <Label layoutX="150" layoutY="30" style="-fx-font-size: 18px;" text="Iniciar Sesión" />
-        <Label layoutX="70" layoutY="90" text="Usuario:" />
-        <TextField fx:id="usuarioField" layoutX="140" layoutY="85" prefWidth="180" />
-        <Label layoutX="50" layoutY="130" text="Contraseña:" />
-        <PasswordField fx:id="contrasenaField" layoutX="140" layoutY="125" prefWidth="180" />
-        <Button layoutX="110.0" layoutY="180.0" onAction="#handleLogin" prefWidth="80" style="-fx-background-color: #E0D6DD; -fx-border-color: #d0a3cf;" text="Ingresar" />
-        <Button layoutX="205.0" layoutY="180.0" onAction="#handleRegistro" prefWidth="100" style="-fx-background-color: #E0D6DD; -fx-border-color: #d0a3cf;" text="Registrarme" />
+        <Label layoutX="150" layoutY="30" style="-fx-font-size: 20px;" text="Panel de Administrador" />
+        <Button layoutX="100" layoutY="90" onAction="#handleGestionUsuarios" prefWidth="300" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Registrar/Modificar/Eliminar Médicos y Pacientes" />
+        <Button layoutX="100" layoutY="140" onAction="#handleGestionSalas" prefWidth="300" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Gestión de Salas y Horarios" />
+        <Button layoutX="100" layoutY="190" onAction="#handleMonitoreo" prefWidth="300" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Monitoreo y Asignación de Pacientes" />
+        <Button layoutX="100" layoutY="240" onAction="#handleReportes" prefWidth="300" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Generar Reportes" />
+        <Button layoutX="100" layoutY="290" onAction="#handleVerReporteCitas" prefWidth="300" style="-fx-background-color: #E0D6DD #E0D6DD; -fx-border-color: #D29BEF;" text="Ver Reporte de Citas" />
+        <Button layoutX="14.0" layoutY="18.0" onAction="#handleCerrarSesion" style="-fx-background-color: #E0D6DD #E0D6DD; -fx-border-color: #D29BEF;" text="Cerrar sesión" />
     </children>
 </AnchorPane>
