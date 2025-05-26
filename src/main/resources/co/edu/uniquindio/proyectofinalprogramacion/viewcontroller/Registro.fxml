@@ -9,7 +9,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="330" prefWidth="400" style="-fx-background-color: #fbe3e3; -fx-border-color: #D29BEF;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.RegistroController">
+<AnchorPane prefHeight="330" prefWidth="400" style="-fx-background-color: #fbe3e3; -fx-border-color: #D29BEF;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.RegistroController">
     <children>
         <Label layoutX="120" layoutY="20" style="-fx-font-size: 18px;" text="Registro de Usuario" />
         <Label layoutX="60" layoutY="70" text="Usuario:" />
@@ -21,7 +21,7 @@
         <Label layoutX="60" layoutY="190" text="Contraseña:" />
         <PasswordField fx:id="contrasenaField" layoutX="150" layoutY="185" prefWidth="180" />
         <Label layoutX="60" layoutY="230" text="Rol:" />
-        <ComboBox fx:id="rolComboBox" layoutX="150" layoutY="225" prefWidth="180" style="-fx-background-color: #E0D6DD;">
+        <ComboBox fx:id="rolComboBox" layoutX="150" layoutY="225" prefWidth="180" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;">
             <items>
                 <FXCollections fx:factory="observableArrayList">
                     <String fx:value="Paciente" />
@@ -30,6 +30,6 @@
                 </FXCollections>
             </items>
         </ComboBox>
-        <Button layoutX="150" layoutY="270" onAction="#handleRegistrar" prefWidth="100" style="-fx-background-color: #E0D6DD #E0D6DD; -fx-border-color: #D29BEF;" text="Registrar" />
+        <Button layoutX="150" layoutY="270" onAction="#handleRegistrar" prefWidth="100" style="-fx-background-color: #bceeff; -fx-border-color: #D29BEF;" text="Registrar" />
     </children>
 </AnchorPane>
