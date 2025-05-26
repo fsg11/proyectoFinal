@@ -7,12 +7,12 @@
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="466.0" prefWidth="492.0" style="-fx-background-color: #fbe3e3;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.MedicoController">
+<AnchorPane prefHeight="466.0" prefWidth="492.0" style="-fx-background-color: #fbe3e3;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.MedicoController">
     <children>
         <Label layoutX="180" layoutY="20" style="-fx-font-size: 20px;" text="Panel de Médico" />
-        <Button layoutX="150" layoutY="70" onAction="#handleVerHistoriales" prefWidth="200" style="-fx-background-color: #E0D6DD #E0D6DD; -fx-border-color: #D29BEF;" text="Ver Historiales de Pacientes" />
-        <Button layoutX="150" layoutY="120" onAction="#handleRegistrarDiagnostico" prefWidth="200" style="-fx-background-color: #E0D6DD #E0D6DD; -fx-border-color: #D29BEF};" text="Registrar Diagnóstico/Tratamiento" />
-        <Button layoutX="150.0" layoutY="168.0" onAction="#handleVerNotificaciones" prefWidth="200" style="-fx-background-color: #E0D6DD #E0D6DD; -fx-border-color: #D29BEF;" text="Ver Notificaciones de Citas" />
+        <Button layoutX="150" layoutY="70" onAction="#handleVerHistoriales" prefWidth="200" style="-fx-background-color: #bceeff; -fx-border-color: #D29BEF;" text="Ver Historiales de Pacientes" />
+        <Button layoutX="150" layoutY="120" onAction="#handleRegistrarDiagnostico" prefWidth="200" style="-fx-background-color: #bceeff; -fx-border-color: #D29BEF};" text="Registrar Diagnóstico/Tratamiento" />
+        <Button layoutX="150.0" layoutY="168.0" onAction="#handleVerNotificaciones" prefWidth="200" style="-fx-background-color: #bceeff; -fx-border-color: #D29BEF;" text="Ver Notificaciones de Citas" />
         <Button onAction="#handleCerrarSesion" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Cerrar sesión" />
         <Label layoutX="170.0" layoutY="221.0" style="-fx-font-size: 16px;" text="Registrar Disponibilidad" />
         <Label layoutX="125.0" layoutY="268.0" text="Fecha:" />
@@ -24,8 +24,8 @@
         <Spinner fx:id="spinnerHoraFin" layoutX="170.0" layoutY="336.0" prefWidth="80" />
         <Spinner fx:id="spinnerMinutoFin" layoutX="250.0" layoutY="336.0" prefWidth="60" />
         <Label layoutX="113.0" layoutY="390.0" text="Sala:" />
-        <ComboBox fx:id="comboSalas" layoutX="150.0" layoutY="386.0" prefWidth="200" style="-fx-background-color: #E0D6DD;" />
-        <Button layoutX="184.0" layoutY="427.0" onAction="#handleAdministrarHorarios" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Registrar Disponibilidad" />
+        <ComboBox fx:id="comboSalas" layoutX="150.0" layoutY="386.0" prefWidth="200" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" />
+        <Button layoutX="184.0" layoutY="427.0" onAction="#handleAdministrarHorarios" style="-fx-background-color: #bceeff; -fx-border-color: #D29BEF;" text="Registrar Disponibilidad" />
 
     </children>
 </AnchorPane>
