@@ -13,7 +13,7 @@
         <TextField fx:id="usuarioField" layoutX="140" layoutY="85" prefWidth="180" />
         <Label layoutX="50" layoutY="130" text="Contraseña:" />
         <PasswordField fx:id="contrasenaField" layoutX="140" layoutY="125" prefWidth="180" />
-        <Button layoutX="160" layoutY="180" onAction="#handleLogin" prefWidth="80" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Ingresar" />
-        <Button layoutX="260" layoutY="180" onAction="#handleRegistro" prefWidth="100" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Registrarme" />
+        <Button layoutX="140.0" layoutY="180.0" onAction="#handleLogin" prefWidth="80" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Ingresar" />
+        <Button layoutX="255.0" layoutY="180.0" onAction="#handleRegistro" prefWidth="100" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Registrarme" />
     </children>
 </AnchorPane>
