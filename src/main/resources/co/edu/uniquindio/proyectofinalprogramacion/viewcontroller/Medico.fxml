@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" prefWidth="500" prefHeight="400"
-            fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.MedicoController">
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="466.0" prefWidth="492.0" style="-fx-background-color: #fbe3e3;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.MedicoController">
     <children>
-        <Label text="Panel de Médico" layoutX="180" layoutY="20" style="-fx-font-size: 20px;"/>
-        <Button text="Ver Historiales de Pacientes" layoutX="150" layoutY="70" prefWidth="200" onAction="#handleVerHistoriales"/>
-        <Button text="Registrar Diagnóstico/Tratamiento" layoutX="150" layoutY="120" prefWidth="200" onAction="#handleRegistrarDiagnostico"/>
-        <Button text="Ver Notificaciones de Citas" layoutX="150" layoutY="220" prefWidth="200" onAction="#handleVerNotificaciones"/>
-        <Button text="Cerrar sesión" onAction="#handleCerrarSesion"/>
-        <Label text="Registrar Disponibilidad" layoutX="170" layoutY="270" style="-fx-font-size: 16px;"/>
-        <Label text="Fecha:" layoutX="100" layoutY="310"/>
-        <DatePicker fx:id="datePickerDisponibilidad" layoutX="150" layoutY="305"/>
-        <Label text="Hora inicio:" layoutX="100" layoutY="350"/>
-        <Spinner fx:id="spinnerHoraInicio" layoutX="170" layoutY="345" prefWidth="80"/>
-        <Spinner fx:id="spinnerMinutoInicio" layoutX="240" layoutY="345" prefWidth="60"/>
-        <Label text="Hora fin:" layoutX="100" layoutY="390"/>
-        <Spinner fx:id="spinnerHoraFin" layoutX="170" layoutY="385" prefWidth="80"/>
-        <Spinner fx:id="spinnerMinutoFin" layoutX="240" layoutY="385" prefWidth="60"/>
-        <Label text="Sala:" layoutX="100" layoutY="410"/>
-        <ComboBox fx:id="comboSalas" layoutX="150" layoutY="405" prefWidth="200"/>
-        <Button text="Registrar Disponibilidad" layoutX="170" layoutY="430" onAction="#handleAdministrarHorarios"/>
+        <Label layoutX="180" layoutY="20" style="-fx-font-size: 20px;" text="Panel de Médico" />
+        <Button layoutX="150" layoutY="70" onAction="#handleVerHistoriales" prefWidth="200" style="-fx-background-color: #E0D6DD #E0D6DD; -fx-border-color: #D29BEF;" text="Ver Historiales de Pacientes" />
+        <Button layoutX="150" layoutY="120" onAction="#handleRegistrarDiagnostico" prefWidth="200" style="-fx-background-color: #E0D6DD #E0D6DD; -fx-border-color: #D29BEF};" text="Registrar Diagnóstico/Tratamiento" />
+        <Button layoutX="150.0" layoutY="168.0" onAction="#handleVerNotificaciones" prefWidth="200" style="-fx-background-color: #E0D6DD #E0D6DD; -fx-border-color: #D29BEF;" text="Ver Notificaciones de Citas" />
+        <Button onAction="#handleCerrarSesion" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Cerrar sesión" />
+        <Label layoutX="170.0" layoutY="221.0" style="-fx-font-size: 16px;" text="Registrar Disponibilidad" />
+        <Label layoutX="125.0" layoutY="268.0" text="Fecha:" />
+        <DatePicker fx:id="datePickerDisponibilidad" layoutX="168.0" layoutY="264.0" />
+        <Label layoutX="106.0" layoutY="304.0" text="Hora inicio:" />
+        <Spinner fx:id="spinnerHoraInicio" layoutX="170.0" layoutY="300.0" prefWidth="80" />
+        <Spinner fx:id="spinnerMinutoInicio" layoutX="250.0" layoutY="300.0" prefWidth="60" />
+        <Label layoutX="115.0" layoutY="340.0" text="Hora fin:" />
+        <Spinner fx:id="spinnerHoraFin" layoutX="170.0" layoutY="336.0" prefWidth="80" />
+        <Spinner fx:id="spinnerMinutoFin" layoutX="250.0" layoutY="336.0" prefWidth="60" />
+        <Label layoutX="113.0" layoutY="390.0" text="Sala:" />
+        <ComboBox fx:id="comboSalas" layoutX="150.0" layoutY="386.0" prefWidth="200" style="-fx-background-color: #E0D6DD;" />
+        <Button layoutX="184.0" layoutY="427.0" onAction="#handleAdministrarHorarios" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Registrar Disponibilidad" />
 
     </children>
 </AnchorPane>
