@@ -5,16 +5,16 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="400" prefWidth="500" style="-fx-background-color: #fbe3e3; -fx-border-color: #D29BEF;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.PacienteController">
+<AnchorPane prefHeight="400" prefWidth="500" style="-fx-background-color: #fbe3e3; -fx-border-color: #D29BEF;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.proyectofinalprogramacion.controller.PacienteController">
     <children>
         <Label layoutX="180" layoutY="20" style="-fx-font-size: 20px;" text="Panel de Paciente" />
-        <Button layoutX="150" layoutY="70" onAction="#handleActualizarDatos" prefWidth="200" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Actualizar Datos Personales" />
-        <Button layoutX="150" layoutY="120" onAction="#handleSolicitarCita" prefWidth="200" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Solicitar Cita Médica" />
-        <Button layoutX="150" layoutY="170" onAction="#handleCancelarCita" prefWidth="200" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Cancelar Cita" />
-        <Button layoutX="150" layoutY="220" onAction="#handleConsultarHistorial" prefWidth="200" style="-fx-border-color: #D29BEF; -fx-background-color: #E0D6DD;" text="Consultar Historial Médico" />
-        <Button layoutX="150" layoutY="270" onAction="#handleVerNotificaciones" prefWidth="200" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Ver Notificaciones" />
+        <Button layoutX="150" layoutY="70" onAction="#handleActualizarDatos" prefWidth="200" style="-fx-background-color: #bceeff; -fx-border-color: #D29BEF;" text="Actualizar Datos Personales" />
+        <Button layoutX="150" layoutY="120" onAction="#handleSolicitarCita" prefWidth="200" style="-fx-background-color: #bceeff; -fx-border-color: #D29BEF;" text="Solicitar Cita Médica" />
+        <Button layoutX="150" layoutY="170" onAction="#handleCancelarCita" prefWidth="200" style="-fx-background-color: #bceeff; -fx-border-color: #D29BEF;" text="Cancelar Cita" />
+        <Button layoutX="150" layoutY="220" onAction="#handleConsultarHistorial" prefWidth="200" style="-fx-border-color: #D29BEF; -fx-background-color: #bceeff;" text="Consultar Historial Médico" />
+        <Button layoutX="150" layoutY="270" onAction="#handleVerNotificaciones" prefWidth="200" style="-fx-background-color: #bceeff; -fx-border-color: #D29BEF;" text="Ver Notificaciones" />
         <Label layoutX="150" layoutY="320" text="Disponibilidades del Médico:" />
-        <ComboBox fx:id="comboDisponibilidades" layoutX="150" layoutY="340" prefWidth="200" style="-fx-background-color: #E0D6DD #E0D6DD;" />
+        <ComboBox fx:id="comboDisponibilidades" layoutX="150" layoutY="340" prefWidth="200" style="-fx-background-color: #E0D6DD #E0D6DD; -fx-border-color: #D29BEF;" />
         <Button onAction="#handleCerrarSesion" style="-fx-background-color: #E0D6DD; -fx-border-color: #D29BEF;" text="Cerrar sesión" />
     </children>
 </AnchorPane>
